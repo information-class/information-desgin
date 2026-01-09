@@ -215,6 +215,14 @@
     { icon: '☃️', label: '雪 (Snow)' }
   ];
 
+  //3ビット用（虹とその色）:000~111に対応
+  const emojiMap3Bit = [
+  { icon: '🔴', label: '赤' }, { icon: '🟠', label: '橙' },
+  { icon: '🟡', label: '黄' }, { icon: '🟢', label: '緑' },
+  { icon: '🔵', label: '青' }, { icon: '🪻', label: '藍' },
+  { icon: '🟣', label: '紫' }, { icon: '🌈', label: '虹' }
+  ];
+ 
   // 4ビット用（いろいろ）: 0000 ～ 1111 に対応 (16種類)
   const emojiMap4Bit = [
     { icon: '🐶', label: 'いぬ' }, { icon: '🐱', label: 'ねこ' }, { icon: '🐭', label: 'ねずみ' }, { icon: '🐹', label: 'ハムスター' },
@@ -223,6 +231,12 @@
     { icon: '🚗', label: 'くるま' }, { icon: '✈️', label: 'ひこうき' }, { icon: '🚀', label: 'ロケット' }, { icon: '🛸', label: 'UFO' }
   ];
 
+  //5ビット用（アルファベットと記号）:00000~11111に対応
+  const emojiMap5Bit = [];
+  const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ?!@#&*"; // 32文字分
+   for (let char of alphabet) {
+  emojiMap5Bit.push({ icon: '🔡', label: char });
+  }
   // DOM Elements for Emoji
   const emojiContainer = document.getElementById('emoji-container');
   const emojiResult = document.getElementById('emoji-result');
