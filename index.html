@@ -192,8 +192,8 @@
     </div>
    </main>
   </div>
-  <script>
-    // Default configuration
+<script>
+    // 1. 基本設定
     const defaultConfig = {
       game_title: '💡 ビットと電球',
       instruction_text: '電球が増えると、必要なスイッチ（ビット）も増える！',
@@ -202,69 +202,39 @@
       text_color: '#e2e8f0'
     };
 
-// 絵文字表示の条件分岐をアップデート
-if (bulbCount === 2) {
-  emojiContainer.classList.remove('hidden');
-  emojiResult.textContent = emojiMap2Bit[currentIndex].icon;
-  emojiLabel.textContent = emojiMap2Bit[currentIndex].label;
-  triggerEmojiAnimation();
-} else if (bulbCount === 3) { // 3ビット（虹）を追加
-  emojiContainer.classList.remove('hidden');
-  emojiResult.textContent = emojiMap3Bit[currentIndex].icon;
-  emojiLabel.textContent = emojiMap3Bit[currentIndex].label;
-  triggerEmojiAnimation();
-} else if (bulbCount === 4) {
-  emojiContainer.classList.remove('hidden');
-  emojiResult.textContent = emojiMap4Bit[currentIndex].icon;
-  emojiLabel.textContent = emojiMap4Bit[currentIndex].label;
-  triggerEmojiAnimation();
-} else if (bulbCount === 5) { // 5ビット（アルファベット）を追加
-  emojiContainer.classList.remove('hidden');
-  emojiResult.textContent = emojiMap5Bit[currentIndex].icon;
-  emojiLabel.textContent = emojiMap5Bit[currentIndex].label;
-  triggerEmojiAnimation();
-} else {
-  emojiContainer.classList.add('hidden');
-}
-    // --- ここから追加 ---
-  // Emoji Mappings
-  // 2ビット用（天気）: 00, 01, 10, 11 に対応
-  const emojiMap2Bit = [
-    { icon: '☀️', label: '晴れ (Sun)' },
-    { icon: '☁️', label: 'くもり (Cloud)' },
-    { icon: '☔', label: '雨 (Rain)' },
-    { icon: '☃️', label: '雪 (Snow)' }
-  ];
+    // 2. 状態管理（State）
+    let bulbCount = 2;
+    let bits = [0, 0];
 
-  //3ビット用（虹とその色）:000~111に対応
-  const emojiMap3Bit = [
-  { icon: '🔴', label: '赤' }, { icon: '🟠', label: '橙' },
-  { icon: '🟡', label: '黄' }, { icon: '🟢', label: '緑' },
-  { icon: '🔵', label: '青' }, { icon: '🪻', label: '藍' },
-  { icon: '🟣', label: '紫' }, { icon: '🌈', label: '虹' }
-  ];
- 
-  // 4ビット用（いろいろ）: 0000 ～ 1111 に対応 (16種類)
-  const emojiMap4Bit = [
-    { icon: '🐶', label: 'いぬ' }, { icon: '🐱', label: 'ねこ' }, { icon: '🐭', label: 'ねずみ' }, { icon: '🐹', label: 'ハムスター' },
-    { icon: '🍎', label: 'りんご' }, { icon: '🍌', label: 'バナナ' }, { icon: '🍇', label: 'ぶどう' }, { icon: '🍉', label: 'すいか' },
-    { icon: '⚽', label: 'サッカー' }, { icon: '🏀', label: 'バスケ' }, { icon: '⚾', label: '野球' }, { icon: '🎾', label: 'テニス' },
-    { icon: '🚗', label: 'くるま' }, { icon: '✈️', label: 'ひこうき' }, { icon: '🚀', label: 'ロケット' }, { icon: '🛸', label: 'UFO' }
-  ];
+    // 3. データ定義（絵文字マップ）
+    const emojiMap2Bit = [
+      { icon: '☀️', label: '晴れ (Sun)' },
+      { icon: '☁️', label: 'くもり (Cloud)' },
+      { icon: '☔', label: '雨 (Rain)' },
+      { icon: '☃️', label: '雪 (Snow)' }
+    ];
 
-  //5ビット用（アルファベットと記号）:00000~11111に対応
-  const emojiMap5Bit = [];
-  const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ?!@#&*"; // 32文字分
-   for (let char of alphabet) {
-  emojiMap5Bit.push({ icon: '🔡', label: char });
-  }
-  // DOM Elements for Emoji
-  const emojiContainer = document.getElementById('emoji-container');
-  const emojiResult = document.getElementById('emoji-result');
-  const emojiLabel = document.getElementById('emoji-label');
-// --- ここまで追加 ---
+    const emojiMap3Bit = [
+      { icon: '🔴', label: '赤' }, { icon: '🟠', label: '橙' },
+      { icon: '🟡', label: '黄' }, { icon: '🟢', label: '緑' },
+      { icon: '🔵', label: '青' }, { icon: '🪻', label: '藍' },
+      { icon: '🟣', label: '紫' }, { icon: '🌈', label: '虹' }
+    ];
 
-    // DOM Elements
+    const emojiMap4Bit = [
+      { icon: '🐶', label: 'いぬ' }, { icon: '🐱', label: 'ねこ' }, { icon: '🐭', label: 'ねずみ' }, { icon: '🐹', label: 'ハムスター' },
+      { icon: '🍎', label: 'りんご' }, { icon: '🍌', label: 'バナナ' }, { icon: '🍇', label: 'ぶどう' }, { icon: '🍉', label: 'すいか' },
+      { icon: '⚽', label: 'サッカー' }, { icon: '🏀', label: 'バスケ' }, { icon: '⚾', label: '野球' }, { icon: '🎾', label: 'テニス' },
+      { icon: '🚗', label: 'くるま' }, { icon: '✈️', label: 'ひこうき' }, { icon: '🚀', label: 'ロケット' }, { icon: '🛸', label: 'UFO' }
+    ];
+
+    const emojiMap5Bit = [];
+    const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ?!@#&*";
+    for (let char of alphabet) {
+      emojiMap5Bit.push({ icon: '🔡', label: char });
+    }
+
+    // 4. DOM要素の取得
     const bulbsContainer = document.getElementById('bulbs-container');
     const switchesContainer = document.getElementById('switches-container');
     const infoBulbs = document.getElementById('info-bulbs');
@@ -278,274 +248,124 @@ if (bulbCount === 2) {
     const bulbCountDisplay = document.getElementById('bulb-count');
     const decreaseBtn = document.getElementById('decrease-bulbs');
     const increaseBtn = document.getElementById('increase-bulbs');
+    const emojiContainer = document.getElementById('emoji-container');
+    const emojiResult = document.getElementById('emoji-result');
+    const emojiLabel = document.getElementById('emoji-label');
 
-    // Calculate required bits for n bulbs (each bulb can be on/off = 2^bulbs patterns, need ceil(log2(patterns)) bits... but actually we need bulbCount bits to control each bulb individually)
-    // Actually: to control N bulbs independently, we need N bits (1 bit per bulb)
-    function getRequiredBits(numBulbs) {
-      return numBulbs;
+    // 5. 補助関数
+    function getRequiredBits(numBulbs) { return numBulbs; }
+
+    function triggerEmojiAnimation() {
+      emojiResult.classList.remove('pulse-in');
+      void emojiResult.offsetWidth; 
+      emojiResult.classList.add('pulse-in');
     }
 
-    // Create bulb SVG
     function createBulbSVG(isOn, index) {
       const bulbDiv = document.createElement('div');
       bulbDiv.className = `flex flex-col items-center pulse-in bulb-swing`;
       bulbDiv.style.animationDelay = `${index * 0.1}s`;
-      
       bulbDiv.innerHTML = `
         <svg width="50" height="70" viewBox="0 0 50 70" class="${isOn ? 'bulb-on' : ''}">
-          <!-- Wire -->
           <line x1="25" y1="0" x2="25" y2="15" stroke="#666" stroke-width="2"/>
-          
-          <!-- Bulb base -->
           <rect x="18" y="50" width="14" height="8" rx="1" fill="#888"/>
           <rect x="20" y="55" width="10" height="4" rx="1" fill="#666"/>
-          
-          <!-- Bulb glass -->
           <ellipse cx="25" cy="35" rx="18" ry="20" fill="${isOn ? '#fef3c7' : '#374151'}" stroke="${isOn ? '#fcd34d' : '#4b5563'}" stroke-width="2"/>
-          
-          <!-- Filament -->
           <path d="M20 35 Q22 30 25 35 Q28 40 30 35" stroke="${isOn ? '#f59e0b' : '#6b7280'}" stroke-width="2" fill="none"/>
-          
-          ${isOn ? `
-          <!-- Glow effect -->
-          <ellipse cx="25" cy="35" rx="15" ry="17" fill="url(#glow${index})" opacity="0.6"/>
-          <defs>
-            <radialGradient id="glow${index}">
-              <stop offset="0%" stop-color="#fef3c7"/>
-              <stop offset="100%" stop-color="transparent"/>
-            </radialGradient>
-          </defs>
-          ` : ''}
+          ${isOn ? `<ellipse cx="25" cy="35" rx="15" ry="17" fill="url(#glow${index})" opacity="0.6"/>
+          <defs><radialGradient id="glow${index}"><stop offset="0%" stop-color="#fef3c7"/><stop offset="100%" stop-color="transparent"/></radialGradient></defs>` : ''}
         </svg>
         <span class="text-xs mt-1 ${isOn ? 'text-amber-400' : 'text-slate-500'} font-display">${isOn ? 'ON' : 'OFF'}</span>
       `;
-      
       return bulbDiv;
     }
 
-    // Create switch element
     function createSwitch(index, isOn) {
       const switchDiv = document.createElement('div');
       switchDiv.className = 'flex flex-col items-center pulse-in';
-      switchDiv.style.animationDelay = `${index * 0.05}s`;
-      
       const track = document.createElement('button');
       track.className = `switch-track w-14 h-8 rounded-full relative cursor-pointer ${isOn ? 'bg-amber-500 switch-on' : 'bg-slate-600'}`;
-      track.setAttribute('role', 'switch');
-      track.setAttribute('aria-checked', isOn);
-      track.setAttribute('aria-label', `ビット${index + 1}: ${isOn ? 'オン' : 'オフ'}`);
-      
       const thumb = document.createElement('div');
       thumb.className = `switch-thumb absolute top-1 left-1 w-6 h-6 bg-white rounded-full shadow-md`;
       if (isOn) thumb.style.transform = 'translateX(24px)';
-      
       track.appendChild(thumb);
-      
       track.addEventListener('click', () => toggleBit(index));
-      
-      const label = document.createElement('span');
-      label.className = `text-xs mt-2 font-display ${isOn ? 'text-amber-400' : 'text-slate-500'}`;
-      label.textContent = `Bit ${index + 1}`;
-      
       const valueLabel = document.createElement('span');
       valueLabel.className = `text-lg font-bold font-display ${isOn ? 'text-white' : 'text-slate-600'}`;
       valueLabel.textContent = isOn ? '1' : '0';
-      
       switchDiv.appendChild(track);
       switchDiv.appendChild(valueLabel);
-      switchDiv.appendChild(label);
-      
       return switchDiv;
     }
 
-    // Toggle bit
     function toggleBit(index) {
       bits[index] = bits[index] ? 0 : 1;
       render();
     }
-// --- ここに追加 ---
-    // Helper to trigger animation on emoji change
-    function triggerEmojiAnimation() {
-      // 一度クラスを削除して強制的に再描画させることでアニメーションをリセット
-      emojiResult.classList.remove('pulse-in');
-      void emojiResult.offsetWidth; // Trigger reflow
-      emojiResult.classList.add('pulse-in');
-    }
-    // Update explanation based on current state
-    function updateExplanation() {
-      const numBits = bits.length;
-      const maxPatterns = Math.pow(2, numBits);
-      
-      let html = '';
-      
-      if (numBits === 1) {
-        html = `
-          <p>🔹 <strong class="text-amber-300">1ビット</strong>では、0と1の<strong class="text-emerald-400">2通り</strong>を表現</p>
-          <p>🔹 電球<strong class="text-amber-300">1個</strong>の「ON/OFF」を制御できます</p>
-          <p class="text-slate-400 pt-2 border-t border-slate-700 mt-3">💡 電球を増やして、ビット数の変化を観察してみよう！</p>
-        `;
-      } else if (numBits === 2) {
-        html = `
-          <p>🔹 <strong class="text-amber-300">2ビット</strong>では<strong class="text-emerald-400">4通り</strong>のパターン（00, 01, 10, 11）</p>
-          <p>🔹 各ビットが1つの電球を担当しています</p>
-          <p class="text-slate-400 pt-2 border-t border-slate-700 mt-3">💡 ビット数が1増えると、パターン数は<strong class="text-amber-300">2倍</strong>に！</p>
-        `;
-      } else if (numBits === 3) {
-        html = `
-          <p>🔹 <strong class="text-amber-300">3ビット</strong>で<strong class="text-emerald-400">8通り</strong>のパターン！</p>
-          <p>🔹 000, 001, 010, 011, 100, 101, 110, 111</p>
-          <p class="text-slate-400 pt-2 border-t border-slate-700 mt-3">💡 2の3乗 = 8パターン表現できる！</p>
-        `;
-      } else if (numBits === 4) {
-        html = `
-          <p>🔹 <strong class="text-amber-300">4ビット</strong>で<strong class="text-emerald-400">16通り</strong>のパターン！</p>
-          <p>🔹 これは16進数の1桁（0〜F）と同じです</p>
-          <p class="text-slate-400 pt-2 border-t border-slate-700 mt-3">💡 倍々で増えていくのがわかりますね！</p>
-        `;
-      } else {
-        html = `
-          <p>🔹 <strong class="text-amber-300">${numBits}ビット</strong>で<strong class="text-emerald-400">${maxPatterns}通り</strong>のパターン！</p>
-          <p>🔹 計算式: 2<sup>${numBits}</sup> = ${maxPatterns}</p>
-          <p class="text-slate-400 pt-2 border-t border-slate-700 mt-3">💡 データ量が増えると、必要なビット数も増える！</p>
-        `;
-      }
-      
-      explanationText.innerHTML = html;
-    }
 
-    // Main render function
+    // 6. メインの描画処理（ココに全てのロジックをまとめます）
     function render() {
       const requiredBits = getRequiredBits(bulbCount);
-      
-      // Adjust bits array if needed
-      while (bits.length < requiredBits) {
-        bits.push(0);
-      }
-      while (bits.length > requiredBits) {
-        bits.pop();
-      }
-      
-      // Update info panel
+      while (bits.length < requiredBits) bits.push(0);
+      while (bits.length > requiredBits) bits.pop();
+
+      // 情報パネルの更新
       infoBulbs.textContent = bulbCount;
       infoBits.textContent = requiredBits;
       infoPatterns.textContent = Math.pow(2, requiredBits);
-      
-      // Render bulbs
+      bulbCountDisplay.textContent = bulbCount;
+
+      // 電球の描画
       bulbsContainer.innerHTML = '';
-      for (let i = 0; i < bulbCount; i++) {
-        const isOn = bits[i] === 1;
-        bulbsContainer.appendChild(createBulbSVG(isOn, i));
-      }
-      
-      // Render switches
+      bits.forEach((isOn, i) => bulbsContainer.appendChild(createBulbSVG(isOn === 1, i)));
+
+      // スイッチの描画
       switchesContainer.innerHTML = '';
-      for (let i = 0; i < requiredBits; i++) {
-        switchesContainer.appendChild(createSwitch(i, bits[i] === 1));
-      }
-      
-      // Update binary display
+      bits.forEach((isOn, i) => switchesContainer.appendChild(createSwitch(i, isOn === 1)));
+
+      // 2進数とパターンの計算
       const binaryStr = bits.join('');
       binaryDisplay.textContent = binaryStr;
-      
-      // Calculate current pattern number (binary to decimal + 1)
-      const patternNum = bits.reduce((acc, bit, i) => acc + bit * Math.pow(2, bits.length - 1 - i), 0) + 1;
-      patternNumber.textContent = `#${patternNum}`;
+      const currentIndex = bits.reduce((acc, bit, i) => acc + bit * Math.pow(2, bits.length - 1 - i), 0);
+      patternNumber.textContent = `#${currentIndex + 1}`;
       totalPatterns.textContent = Math.pow(2, requiredBits);
-      
-      // Update switch count label
-      switchCountLabel.textContent = requiredBits;
-      
-      // Update bulb count display
-      bulbCountDisplay.textContent = bulbCount;
-      
-      // Update explanation
-      updateExplanation();
-      // --- ここから追加 ---
-      // Update Emoji Display based on bulb count
-      // 現在のパターンの数値（0から始まるインデックス）を計算
-      const currentIndex = patternNum - 1;
 
+      // ★ 絵文字表示のロジック ★
       if (bulbCount === 2) {
-        // 2ビットモード：天気を表示
-        emojiContainer.classList.remove('hidden'); // エリアを表示
+        emojiContainer.classList.remove('hidden');
         emojiResult.textContent = emojiMap2Bit[currentIndex].icon;
         emojiLabel.textContent = emojiMap2Bit[currentIndex].label;
-        triggerEmojiAnimation(); // アニメーション再生
-
+        triggerEmojiAnimation();
+      } else if (bulbCount === 3) {
+        emojiContainer.classList.remove('hidden');
+        emojiResult.textContent = emojiMap3Bit[currentIndex].icon;
+        emojiLabel.textContent = emojiMap3Bit[currentIndex].label;
+        triggerEmojiAnimation();
       } else if (bulbCount === 4) {
-        // 4ビットモード：16種類のアイコンを表示
-        emojiContainer.classList.remove('hidden'); // エリアを表示
+        emojiContainer.classList.remove('hidden');
         emojiResult.textContent = emojiMap4Bit[currentIndex].icon;
         emojiLabel.textContent = emojiMap4Bit[currentIndex].label;
-        triggerEmojiAnimation(); // アニメーション再生
-
+        triggerEmojiAnimation();
+      } else if (bulbCount === 5) {
+        emojiContainer.classList.remove('hidden');
+        emojiResult.textContent = emojiMap5Bit[currentIndex].icon;
+        emojiLabel.textContent = emojiMap5Bit[currentIndex].label;
+        triggerEmojiAnimation();
       } else {
-        // それ以外のビット数では隠す
         emojiContainer.classList.add('hidden');
       }
-      
-      // Update button states
+
+      // ボタンの状態
       decreaseBtn.disabled = bulbCount <= 1;
-      decreaseBtn.className = `w-10 h-10 rounded-full ${bulbCount <= 1 ? 'bg-slate-800 text-slate-600 cursor-not-allowed' : 'bg-slate-700 hover:bg-slate-600 text-white'} text-xl font-bold transition-all flex items-center justify-center border border-slate-600`;
-      
       increaseBtn.disabled = bulbCount >= 8;
-      increaseBtn.className = `w-10 h-10 rounded-full ${bulbCount >= 8 ? 'bg-slate-600 text-slate-400 cursor-not-allowed' : 'bg-amber-500 hover:bg-amber-400 text-white'} text-xl font-bold transition-all flex items-center justify-center`;
     }
 
-    // Event listeners
-    decreaseBtn.addEventListener('click', () => {
-      if (bulbCount > 1) {
-        bulbCount--;
-        render();
-      }
-    });
+    // 7. イベントリスナー
+    decreaseBtn.addEventListener('click', () => { if (bulbCount > 1) { bulbCount--; render(); } });
+    increaseBtn.addEventListener('click', () => { if (bulbCount < 8) { bulbCount++; render(); } });
 
-    increaseBtn.addEventListener('click', () => {
-      if (bulbCount < 8) {
-        bulbCount++;
-        render();
-      }
-    });
-
-    // Config change handler
-    async function onConfigChange(config) {
-      const title = config.game_title || defaultConfig.game_title;
-      const instruction = config.instruction_text || defaultConfig.instruction_text;
-      
-      document.getElementById('game-title').textContent = title;
-      document.getElementById('instruction-text').textContent = instruction;
-    }
-
-    // Map to capabilities
-    function mapToCapabilities(config) {
-      return {
-        recolorables: [],
-        borderables: [],
-        fontEditable: undefined,
-        fontSizeable: undefined
-      };
-    }
-
-    // Map to edit panel values
-    function mapToEditPanelValues(config) {
-      return new Map([
-        ['game_title', config.game_title || defaultConfig.game_title],
-        ['instruction_text', config.instruction_text || defaultConfig.instruction_text]
-      ]);
-    }
-
-    // Initialize
+    // 初期実行
     render();
-
-    // Initialize SDK
-    if (window.elementSdk) {
-      window.elementSdk.init({
-        defaultConfig,
-        onConfigChange,
-        mapToCapabilities,
-        mapToEditPanelValues
-      });
-    }
-  </script>
+</script>
  <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9ba9c0b3823b3bb3',t:'MTc2Nzg1NDk0My4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
