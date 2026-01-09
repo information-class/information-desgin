@@ -202,9 +202,30 @@
       text_color: '#e2e8f0'
     };
 
-    // State
-    let bulbCount = 2;
-    let bits = [0];
+// 絵文字表示の条件分岐をアップデート
+if (bulbCount === 2) {
+  emojiContainer.classList.remove('hidden');
+  emojiResult.textContent = emojiMap2Bit[currentIndex].icon;
+  emojiLabel.textContent = emojiMap2Bit[currentIndex].label;
+  triggerEmojiAnimation();
+} else if (bulbCount === 3) { // 3ビット（虹）を追加
+  emojiContainer.classList.remove('hidden');
+  emojiResult.textContent = emojiMap3Bit[currentIndex].icon;
+  emojiLabel.textContent = emojiMap3Bit[currentIndex].label;
+  triggerEmojiAnimation();
+} else if (bulbCount === 4) {
+  emojiContainer.classList.remove('hidden');
+  emojiResult.textContent = emojiMap4Bit[currentIndex].icon;
+  emojiLabel.textContent = emojiMap4Bit[currentIndex].label;
+  triggerEmojiAnimation();
+} else if (bulbCount === 5) { // 5ビット（アルファベット）を追加
+  emojiContainer.classList.remove('hidden');
+  emojiResult.textContent = emojiMap5Bit[currentIndex].icon;
+  emojiLabel.textContent = emojiMap5Bit[currentIndex].label;
+  triggerEmojiAnimation();
+} else {
+  emojiContainer.classList.add('hidden');
+}
     // --- ここから追加 ---
   // Emoji Mappings
   // 2ビット用（天気）: 00, 01, 10, 11 に対応
