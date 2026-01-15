@@ -1,371 +1,176 @@
 <!doctype html>
 <html lang="ja" class="h-full">
- <head>
+<head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ビットと電球</title>
+  <title>ビットとデータの表現学習</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="/_sdk/element_sdk.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&amp;family=Noto+Sans+JP:wght@400;500;700&amp;display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@700&family=Noto+Sans+JP:wght@500;700&display=swap" rel="stylesheet">
   <style>
-    body {
-      box-sizing: border-box;
-    }
-    
-    .font-display {
-      font-family: 'Quicksand', sans-serif;
-    }
-    
-    .font-body {
-      font-family: 'Noto Sans JP', sans-serif;
-    }
-    
-    /* Bulb glow effect */
-    .bulb-on {
-      filter: drop-shadow(0 0 15px #fbbf24) drop-shadow(0 0 30px #f59e0b);
-    }
-    
-    /* Switch styling */
-    .switch-track {
-      transition: background-color 0.3s ease;
-    }
-    
-    .switch-thumb {
-      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    
-    .switch-on .switch-thumb {
-      transform: translateX(24px);
-    }
-    
-    /* Pulse animation for new bit */
+    body { font-family: 'Noto Sans JP', sans-serif; box-sizing: border-box; }
+    .font-display { font-family: 'Quicksand', sans-serif; }
+    .bulb-on { filter: drop-shadow(0 0 15px #fbbf24) drop-shadow(0 0 30px #f59e0b); }
     @keyframes pulse-grow {
       0% { transform: scale(0.8); opacity: 0; }
-      50% { transform: scale(1.1); }
+      50% { transform: scale(1.05); }
       100% { transform: scale(1); opacity: 1; }
     }
-    
-    .pulse-in {
-      animation: pulse-grow 0.4s ease-out;
-    }
-    
-    /* Info card animation */
-    @keyframes slideUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    
-    .slide-up {
-      animation: slideUp 0.5s ease-out;
-    }
-    
-    /* Bulb swing animation */
-    @keyframes swing {
-      0%, 100% { transform: rotate(-2deg); }
-      50% { transform: rotate(2deg); }
-    }
-    
-    .bulb-swing {
-      animation: swing 2s ease-in-out infinite;
-      transform-origin: top center;
-    }
+    .pulse-in { animation: pulse-grow 0.3s ease-out; }
+    .glow-text { text-shadow: 0 0 20px rgba(251, 191, 36, 0.5); }
   </style>
-  <style>@view-transition { navigation: auto; }</style>
-  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
- </head>
- <body class="h-full font-body">
-  <div id="app" class="h-full w-full overflow-auto" style="background: linear-gradient(180deg, #1a1a2e 0%, #16213e 50%, #0f0f23 100%);"><!-- Header -->
-   <header class="text-center pt-6 pb-4 px-4">
-    <h1 id="game-title" class="font-display text-2xl md:text-3xl font-bold text-amber-400 mb-2">💡 ビットと電球</h1>
-    <p id="instruction-text" class="text-slate-400 text-sm md:text-base">電球が増えると、必要なスイッチ（ビット）も増える！</p>
-   </header>
-   <main class="max-w-3xl mx-auto px-4 pb-8"><!-- Bulb Count Control -->
-    <div class="bg-slate-800/60 rounded-2xl p-5 mb-6 border border-slate-700 slide-up">
-     <div class="flex items-center justify-between flex-wrap gap-4">
-      <div>
-       <div class="text-slate-300 font-medium mb-1">
-        電球の数
-       </div>
-       <div class="text-slate-500 text-sm">
-        増やすと必要なビットも増えるよ
-       </div>
-      </div>
-      <div class="flex items-center gap-3"><button id="decrease-bulbs" class="w-10 h-10 rounded-full bg-slate-700 hover:bg-slate-600 text-white text-xl font-bold transition-all flex items-center justify-center border border-slate-600"> − </button> <span id="bulb-count" class="font-display text-3xl text-amber-400 font-bold w-12 text-center">2</span> <button id="increase-bulbs" class="w-10 h-10 rounded-full bg-amber-500 hover:bg-amber-400 text-white text-xl font-bold transition-all flex items-center justify-center"> + </button>
-      </div>
-     </div>
-    </div><!-- Info Panel -->
-    <div id="info-panel" class="bg-gradient-to-r from-indigo-900/50 to-purple-900/50 rounded-2xl p-5 mb-6 border border-indigo-700/50 slide-up">
-     <div class="grid grid-cols-3 gap-4 text-center">
-      <div>
-       <div class="text-indigo-300 text-xs mb-1">
-        電球の数
-       </div>
-       <div id="info-bulbs" class="font-display text-2xl text-white font-bold">
-        2
-       </div>
-      </div>
-      <div>
-       <div class="text-purple-300 text-xs mb-1">
-        必要なビット数
-       </div>
-       <div id="info-bits" class="font-display text-2xl text-amber-400 font-bold">
-        1
-       </div>
-      </div>
-      <div>
-       <div class="text-pink-300 text-xs mb-1">
-        表現できるパターン
-       </div>
-       <div id="info-patterns" class="font-display text-2xl text-emerald-400 font-bold">
-        2
-       </div>
-      </div>
-     </div>
-    </div><!-- Bulbs Display -->
-    <div class="bg-slate-900/50 rounded-2xl p-6 mb-6 border border-slate-700">
-     <div class="text-center text-slate-400 text-sm mb-4">
-      現在の電球の状態
-     </div>
-     <div id="bulbs-container" class="flex justify-center items-end gap-4 flex-wrap min-h-24"><!-- Bulbs will be generated here -->
-     </div>
-    </div>
-    <div id="emoji-container" class="bg-slate-800/60 rounded-2xl p-6 mb-6 border border-slate-700 text-center hidden transition-all">
-      <div class="text-slate-400 text-sm mb-2">
-       組み合わせが表す情報（データ）
-      </div>
-      <div id="emoji-result" class="text-7xl md:text-8xl transition-all filter drop-shadow-lg" style="min-height: 100px; display: flex; align-items: center; justify-content: center;">
-       </div>
-      <div id="emoji-label" class="text-amber-400 font-display font-bold mt-2 text-xl">
-       </div>
-    </div>
-    <!-- Switches (Bits) -->
-    <div class="bg-slate-800/60 rounded-2xl p-5 mb-6 border border-slate-700">
-     <div class="text-center text-slate-400 text-sm mb-4">
-      スイッチ（ビット）<span id="switch-count-label" class="text-amber-400 font-bold">1</span>個
-     </div>
-     <div id="switches-container" class="flex justify-center items-center gap-4 flex-wrap"><!-- Switches will be generated here -->
-     </div><!-- Binary representation -->
-     <div class="mt-4 text-center"><span class="text-slate-500 text-sm">2進数: </span> <span id="binary-display" class="font-display text-lg text-cyan-400">0</span> <span class="text-slate-500 text-sm ml-3">= 電球パターン </span> <span id="pattern-number" class="font-display text-lg text-emerald-400">#1</span> <span class="text-slate-500 text-sm"> / </span> <span id="total-patterns" class="font-display text-lg text-slate-400">2</span>
-     </div>
-    </div><!-- Explanation Card -->
-    <div id="explanation" class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl p-5 border border-slate-700">
-     <h3 class="text-amber-400 font-bold mb-3 flex items-center gap-2"><span>📚</span> なぜビットが増えるの？</h3>
-     <div id="explanation-text" class="text-slate-300 text-sm leading-relaxed space-y-2">
-      <p>🔹 <strong class="text-amber-300">1ビット</strong>では、0と1の<strong class="text-emerald-400">2通り</strong>を表現できます</p>
-      <p>🔹 電球が<strong class="text-amber-300">2個</strong>なら、「両方OFF」「1個だけON」など<strong class="text-emerald-400">2通り以上</strong>のパターンが必要！</p>
-      <p class="text-slate-400 pt-2 border-t border-slate-700 mt-3">💡 電球を増やして、ビット数の変化を観察してみよう！</p>
-     </div>
-    </div><!-- Quick Reference -->
-    <div class="mt-6 grid grid-cols-2 md:grid-cols-4 gap-3 text-center text-sm">
-     <div class="bg-slate-800/40 rounded-xl p-3 border border-slate-700">
-      <div class="text-slate-400">
-       1ビット
-      </div>
-      <div class="text-amber-400 font-display font-bold">
-       2パターン
-      </div>
-     </div>
-     <div class="bg-slate-800/40 rounded-xl p-3 border border-slate-700">
-      <div class="text-slate-400">
-       2ビット
-      </div>
-      <div class="text-amber-400 font-display font-bold">
-       4パターン
-      </div>
-     </div>
-     <div class="bg-slate-800/40 rounded-xl p-3 border border-slate-700">
-      <div class="text-slate-400">
-       3ビット
-      </div>
-      <div class="text-amber-400 font-display font-bold">
-       8パターン
-      </div>
-     </div>
-     <div class="bg-slate-800/40 rounded-xl p-3 border border-slate-700">
-      <div class="text-slate-400">
-       4ビット
-      </div>
-      <div class="text-amber-400 font-display font-bold">
-       16パターン
-      </div>
-     </div>
-    </div>
-   </main>
-  </div>
-<script>
-    // 1. 基本設定
-    const defaultConfig = {
-      game_title: '💡 ビットと電球',
-      instruction_text: '電球が増えると、必要なスイッチ（ビット）も増える！',
-      primary_color: '#fbbf24',
-      secondary_color: '#1e293b',
-      text_color: '#e2e8f0'
-    };
+</head>
+<body class="h-full text-slate-200" style="background: linear-gradient(180deg, #1a1a2e 0%, #16213e 50%, #0f0f23 100%);">
+  <div id="app" class="h-full w-full overflow-auto">
+    <header class="text-center pt-6 pb-4 px-4">
+      <h1 class="font-display text-2xl md:text-4xl font-bold text-amber-400 mb-2">💡 ビットと情報の変化</h1>
+      <p class="text-slate-400 text-sm md:text-base">スイッチの組み合わせで、表せる「情報」が変わるよ！</p>
+    </header>
 
-    // 2. 状態管理（State）
+    <main class="max-w-3xl mx-auto px-4 pb-8">
+      <div class="bg-slate-800/60 rounded-2xl p-5 mb-6 border border-slate-700">
+        <div class="flex items-center justify-between flex-wrap gap-4">
+          <div>
+            <div class="text-slate-300 font-bold mb-1 text-lg">電球（ビット）の数</div>
+            <div id="bit-theme-label" class="text-amber-400 font-bold">現在のテーマ：読み込み中...</div>
+          </div>
+          <div class="flex items-center gap-3">
+            <button id="decrease-bulbs" class="w-12 h-12 rounded-full bg-slate-700 hover:bg-slate-600 text-white text-2xl font-bold transition-all border border-slate-600"> − </button>
+            <span id="bulb-count" class="font-display text-4xl text-amber-400 font-bold w-12 text-center">2</span>
+            <button id="increase-bulbs" class="w-12 h-12 rounded-full bg-amber-500 hover:bg-amber-400 text-white text-2xl font-bold transition-all"> + </button>
+          </div>
+        </div>
+      </div>
+
+      <div id="emoji-container" class="bg-indigo-950/40 rounded-3xl p-8 mb-6 border-2 border-indigo-500/30 text-center transition-all">
+        <div class="text-indigo-300 text-xs mb-4 tracking-widest uppercase font-bold">Computer Data Interpretation</div>
+        <div id="emoji-result" class="text-8xl md:text-9xl transition-all font-display font-bold glow-text py-4 flex justify-center items-center min-h-[160px]"></div>
+        <div id="emoji-label" class="text-amber-400 font-bold mt-4 text-2xl tracking-widest"></div>
+      </div>
+
+      <div class="bg-slate-900/50 rounded-2xl p-6 mb-6 border border-slate-700">
+        <div id="bulbs-container" class="flex justify-center items-end gap-3 flex-wrap min-h-24"></div>
+      </div>
+
+      <div class="bg-slate-800/60 rounded-2xl p-5 mb-6 border border-slate-700 text-center">
+        <div id="switches-container" class="flex justify-center items-center gap-2 flex-wrap mb-4"></div>
+        <div class="pt-4 border-t border-slate-700 inline-block w-full">
+          <span class="text-slate-500 text-sm font-bold">2進数データ: </span>
+          <span id="binary-display" class="font-display text-2xl text-cyan-400 mx-2 tracking-widest">00</span>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
     let bulbCount = 2;
     let bits = [0, 0];
 
-    // 3. データ定義（絵文字マップ）
-    const emojiMap2Bit = [
-      { icon: '☀️', label: '晴れ (Sun)' },
-      { icon: '☁️', label: 'くもり (Cloud)' },
-      { icon: '☔', label: '雨 (Rain)' },
-      { icon: '☃️', label: '雪 (Snow)' }
-    ];
+    // --- 各ビットのデータ定義 ---
+    const dataMaps = {
+      2: [
+        { icon: '☀️', label: 'はれ' }, { icon: '☁️', label: 'くもり' },
+        { icon: '☔', label: 'あめ' }, { icon: '☃️', label: 'ゆき' }
+      ],
+      3: [
+        { icon: '🔴', label: '赤' }, { icon: '🟠', label: '橙' }, { icon: '🟡', label: '黄' }, { icon: '🟢', label: '緑' },
+        { icon: '🔵', label: '青' }, { icon: '🪻', label: '藍' }, { icon: '🟣', label: '紫' }, { icon: '🌈', label: 'にじ' }
+      ],
+      4: [
+        { icon: '🐶', label: 'イヌ' }, { icon: '🐱', label: 'ネコ' }, { icon: '🐭', label: 'ネズミ' }, { icon: '🐹', label: 'ハムスター' },
+        { icon: '🍎', label: 'リンゴ' }, { icon: '🍌', label: 'バナナ' }, { icon: '🍇', label: 'ブドウ' }, { icon: '🍉', label: 'スイカ' },
+        { icon: '⚽', label: 'サッカー' }, { icon: '🏀', label: 'バスケ' }, { icon: '⚾', label: '野球' }, { icon: '🎾', label: 'テニス' },
+        { icon: '🚗', label: 'クルマ' }, { icon: '✈️', label: 'ヒコーキ' }, { icon: '🚀', label: 'ロケット' }, { icon: '🛸', label: 'UFO' }
+      ],
+      5: "ABCDEFGHIJKLMNOPQRSTUVWXYZ!?@#&=".split('').map(char => ({ icon: char, label: `${char}」` })),
+      6: [
+        '🍎','🍊','🍋','🍌','🍉','🍇','🍓','🍈','🍒','🍑','🍍','🥦','🌽','🥕','🍔','🍟',
+        '🍕','🍙','🍣','🍦','🍩','🍪','🍫','🧁','🐶','🐱','🐭','🐹','🐰','🦊','🐻','🐼',
+        '🐨','🐯','🦁','🐮','🐷','🐸','🐵','🐣','🐝','🦋','🐞','🐙','🦑','🦐','🐠','🐬',
+        '🚗','🚕','🚌','🏎️','🚓','🚑','🚒','🚲','✈️','🚀','🛸','🛳️','🎸','🎮','⌚','📱'
+      ].map(emoji => ({ icon: emoji, label: 'ずかん' }))
+    };
 
-    const emojiMap3Bit = [
-      { icon: '🔴', label: '赤' }, { icon: '🟠', label: '橙' },
-      { icon: '🟡', label: '黄' }, { icon: '🟢', label: '緑' },
-      { icon: '🔵', label: '青' }, { icon: '🪻', label: '藍' },
-      { icon: '🟣', label: '紫' }, { icon: '🌈', label: '虹' }
-    ];
+    const themes = {
+      1: "1ビット：ON か OFF か",
+      2: "2ビット：おてんき",
+      3: "3ビット：にじの色",
+      4: "4ビット：いろいろな絵",
+      5: "5ビット：アルファベット",
+      6: "6ビット：たくさん図鑑",
+      7: "7ビット：さらに倍！",
+      8: "8ビット：1バイト(256通り)"
+    };
 
-    const emojiMap4Bit = [
-      { icon: '🐶', label: 'いぬ' }, { icon: '🐱', label: 'ねこ' }, { icon: '🐭', label: 'ねずみ' }, { icon: '🐹', label: 'ハムスター' },
-      { icon: '🍎', label: 'りんご' }, { icon: '🍌', label: 'バナナ' }, { icon: '🍇', label: 'ぶどう' }, { icon: '🍉', label: 'すいか' },
-      { icon: '⚽', label: 'サッカー' }, { icon: '🏀', label: 'バスケ' }, { icon: '⚾', label: '野球' }, { icon: '🎾', label: 'テニス' },
-      { icon: '🚗', label: 'くるま' }, { icon: '✈️', label: 'ひこうき' }, { icon: '🚀', label: 'ロケット' }, { icon: '🛸', label: 'UFO' }
-    ];
-
-    const emojiMap5Bit = [];
-    const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ?!@#&*";
-    for (let char of alphabet) {
-      emojiMap5Bit.push({ icon: '🔡', label: char });
-    }
-
-    // 4. DOM要素の取得
-    const bulbsContainer = document.getElementById('bulbs-container');
-    const switchesContainer = document.getElementById('switches-container');
-    const infoBulbs = document.getElementById('info-bulbs');
-    const infoBits = document.getElementById('info-bits');
-    const infoPatterns = document.getElementById('info-patterns');
-    const binaryDisplay = document.getElementById('binary-display');
-    const patternNumber = document.getElementById('pattern-number');
-    const totalPatterns = document.getElementById('total-patterns');
-    const switchCountLabel = document.getElementById('switch-count-label');
-    const explanationText = document.getElementById('explanation-text');
-    const bulbCountDisplay = document.getElementById('bulb-count');
-    const decreaseBtn = document.getElementById('decrease-bulbs');
-    const increaseBtn = document.getElementById('increase-bulbs');
-    const emojiContainer = document.getElementById('emoji-container');
-    const emojiResult = document.getElementById('emoji-result');
-    const emojiLabel = document.getElementById('emoji-label');
-
-    // 5. 補助関数
-    function getRequiredBits(numBulbs) { return numBulbs; }
-
-    function triggerEmojiAnimation() {
-      emojiResult.classList.remove('pulse-in');
-      void emojiResult.offsetWidth; 
-      emojiResult.classList.add('pulse-in');
-    }
-
-    function createBulbSVG(isOn, index) {
-      const bulbDiv = document.createElement('div');
-      bulbDiv.className = `flex flex-col items-center pulse-in bulb-swing`;
-      bulbDiv.style.animationDelay = `${index * 0.1}s`;
-      bulbDiv.innerHTML = `
-        <svg width="50" height="70" viewBox="0 0 50 70" class="${isOn ? 'bulb-on' : ''}">
-          <line x1="25" y1="0" x2="25" y2="15" stroke="#666" stroke-width="2"/>
-          <rect x="18" y="50" width="14" height="8" rx="1" fill="#888"/>
-          <rect x="20" y="55" width="10" height="4" rx="1" fill="#666"/>
-          <ellipse cx="25" cy="35" rx="18" ry="20" fill="${isOn ? '#fef3c7' : '#374151'}" stroke="${isOn ? '#fcd34d' : '#4b5563'}" stroke-width="2"/>
-          <path d="M20 35 Q22 30 25 35 Q28 40 30 35" stroke="${isOn ? '#f59e0b' : '#6b7280'}" stroke-width="2" fill="none"/>
-          ${isOn ? `<ellipse cx="25" cy="35" rx="15" ry="17" fill="url(#glow${index})" opacity="0.6"/>
-          <defs><radialGradient id="glow${index}"><stop offset="0%" stop-color="#fef3c7"/><stop offset="100%" stop-color="transparent"/></radialGradient></defs>` : ''}
+    function createBulb(isOn, index) {
+      const div = document.createElement('div');
+      div.className = "flex flex-col items-center pulse-in";
+      div.innerHTML = `
+        <svg width="40" height="60" viewBox="0 0 50 70" class="${isOn ? 'bulb-on' : ''}">
+          <circle cx="25" cy="35" r="20" fill="${isOn ? '#fef3c7' : '#374151'}" stroke="${isOn ? '#fcd34d' : '#4b5563'}" stroke-width="2"/>
+          <path d="M20 55 L30 55 L28 65 L22 65 Z" fill="#888"/>
         </svg>
-        <span class="text-xs mt-1 ${isOn ? 'text-amber-400' : 'text-slate-500'} font-display">${isOn ? 'ON' : 'OFF'}</span>
       `;
-      return bulbDiv;
+      return div;
     }
 
     function createSwitch(index, isOn) {
-      const switchDiv = document.createElement('div');
-      switchDiv.className = 'flex flex-col items-center pulse-in';
-      const track = document.createElement('button');
-      track.className = `switch-track w-14 h-8 rounded-full relative cursor-pointer ${isOn ? 'bg-amber-500 switch-on' : 'bg-slate-600'}`;
-      const thumb = document.createElement('div');
-      thumb.className = `switch-thumb absolute top-1 left-1 w-6 h-6 bg-white rounded-full shadow-md`;
-      if (isOn) thumb.style.transform = 'translateX(24px)';
-      track.appendChild(thumb);
-      track.addEventListener('click', () => toggleBit(index));
-      const valueLabel = document.createElement('span');
-      valueLabel.className = `text-lg font-bold font-display ${isOn ? 'text-white' : 'text-slate-600'}`;
-      valueLabel.textContent = isOn ? '1' : '0';
-      switchDiv.appendChild(track);
-      switchDiv.appendChild(valueLabel);
-      return switchDiv;
+      const btn = document.createElement('button');
+      btn.className = `w-14 h-20 rounded-xl border-b-4 flex flex-col items-center justify-center transition-all ${isOn ? 'bg-amber-500 border-amber-700 translate-y-1' : 'bg-slate-600 border-slate-800'}`;
+      btn.innerHTML = `<span class="text-2xl font-display font-bold text-white">${isOn ? '1' : '0'}</span><span class="text-[8px] opacity-50">BIT ${index+1}</span>`;
+      btn.onclick = () => { bits[index] = bits[index] ? 0 : 1; render(); };
+      return btn;
     }
 
-    function toggleBit(index) {
-      bits[index] = bits[index] ? 0 : 1;
-      render();
-    }
-
-    // 6. メインの描画処理（ココに全てのロジックをまとめます）
     function render() {
-      const requiredBits = getRequiredBits(bulbCount);
-      while (bits.length < requiredBits) bits.push(0);
-      while (bits.length > requiredBits) bits.pop();
+      // データの同期
+      while (bits.length < bulbCount) bits.push(0);
+      while (bits.length > bulbCount) bits.pop();
 
-      // 情報パネルの更新
-      infoBulbs.textContent = bulbCount;
-      infoBits.textContent = requiredBits;
-      infoPatterns.textContent = Math.pow(2, requiredBits);
-      bulbCountDisplay.textContent = bulbCount;
+      // UIの更新
+      document.getElementById('bulb-count').textContent = bulbCount;
+      document.getElementById('bit-theme-label').textContent = `現在のテーマ：${themes[bulbCount] || bulbCount + 'ビット'}`;
 
-      // 電球の描画
-      bulbsContainer.innerHTML = '';
-      bits.forEach((isOn, i) => bulbsContainer.appendChild(createBulbSVG(isOn === 1, i)));
+      // 電球表示
+      const bContainer = document.getElementById('bulbs-container');
+      bContainer.innerHTML = '';
+      bits.forEach((b, i) => bContainer.appendChild(createBulb(b === 1, i)));
 
-      // スイッチの描画
-      switchesContainer.innerHTML = '';
-      bits.forEach((isOn, i) => switchesContainer.appendChild(createSwitch(i, isOn === 1)));
+      // スイッチ表示
+      const sContainer = document.getElementById('switches-container');
+      sContainer.innerHTML = '';
+      bits.forEach((b, i) => sContainer.appendChild(createSwitch(i, b === 1)));
 
-      // 2進数とパターンの計算
+      // 2進数文字列と数値計算
       const binaryStr = bits.join('');
-      binaryDisplay.textContent = binaryStr;
-      const currentIndex = bits.reduce((acc, bit, i) => acc + bit * Math.pow(2, bits.length - 1 - i), 0);
-      patternNumber.textContent = `#${currentIndex + 1}`;
-      totalPatterns.textContent = Math.pow(2, requiredBits);
+      document.getElementById('binary-display').textContent = binaryStr;
+      const val = parseInt(binaryStr, 2);
 
-      // ★ 絵文字表示のロジック ★
-      if (bulbCount === 2) {
-        emojiContainer.classList.remove('hidden');
-        emojiResult.textContent = emojiMap2Bit[currentIndex].icon;
-        emojiLabel.textContent = emojiMap2Bit[currentIndex].label;
-        triggerEmojiAnimation();
-      } else if (bulbCount === 3) {
-        emojiContainer.classList.remove('hidden');
-        emojiResult.textContent = emojiMap3Bit[currentIndex].icon;
-        emojiLabel.textContent = emojiMap3Bit[currentIndex].label;
-        triggerEmojiAnimation();
-      } else if (bulbCount === 4) {
-        emojiContainer.classList.remove('hidden');
-        emojiResult.textContent = emojiMap4Bit[currentIndex].icon;
-        emojiLabel.textContent = emojiMap4Bit[currentIndex].label;
-        triggerEmojiAnimation();
-      } else if (bulbCount === 5) {
-        emojiContainer.classList.remove('hidden');
-        emojiResult.textContent = emojiMap5Bit[currentIndex].icon;
-        emojiLabel.textContent = emojiMap5Bit[currentIndex].label;
-        triggerEmojiAnimation();
+      // 絵文字/文字表示
+      const res = document.getElementById('emoji-result');
+      const lab = document.getElementById('emoji-label');
+      const container = document.getElementById('emoji-container');
+
+      const currentMap = dataMaps[bulbCount];
+      if (currentMap && currentMap[val]) {
+        container.style.display = 'block';
+        res.textContent = currentMap[val].icon;
+        lab.textContent = currentMap[val].label;
+        
+        // 5ビットのアルファベットの時は色を青白くして「文字」っぽさを強調
+        res.className = `text-8xl md:text-9xl transition-all font-display font-bold glow-text py-4 flex justify-center items-center min-h-[160px] pulse-in ${bulbCount === 5 ? 'text-cyan-300' : 'text-white'}`;
       } else {
-        emojiContainer.classList.add('hidden');
+        container.style.display = 'none';
       }
 
-      // ボタンの状態
-      decreaseBtn.disabled = bulbCount <= 1;
-      increaseBtn.disabled = bulbCount >= 8;
+      // ボタン制御
+      document.getElementById('decrease-bulbs').disabled = bulbCount <= 1;
+      document.getElementById('increase-bulbs').disabled = bulbCount >= 8;
     }
 
-    // 7. イベントリスナー
-    decreaseBtn.addEventListener('click', () => { if (bulbCount > 1) { bulbCount--; render(); } });
-    increaseBtn.addEventListener('click', () => { if (bulbCount < 8) { bulbCount++; render(); } });
+    document.getElementById('decrease-bulbs').onclick = () => { if(bulbCount > 1) { bulbCount--; render(); } };
+    document.getElementById('increase-bulbs').onclick = () => { if(bulbCount < 8) { bulbCount++; render(); } };
 
-    // 初期実行
     render();
-</script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9ba9c0b3823b3bb3',t:'MTc2Nzg1NDk0My4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+  </script>
+</body>
 </html>
